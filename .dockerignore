@@ -1,0 +1,10 @@
+/target/
+/releases/
+/.vscode/
+/.git/
+.DS_STORE
+.gitignore
+*.md
+.env*
+README.md
+docker-compose.yml

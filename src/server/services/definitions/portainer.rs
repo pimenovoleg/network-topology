@@ -1,0 +1,36 @@
+use crate::server::hosts::r#impl::ports::PortBase;
+use crate::server::services::definitions::{ServiceDefinitionFactory, create_service};
+use crate::server::services::r#impl::categories::ServiceCategory;
+use crate::server::services::r#impl::definitions::ServiceDefinition;
+use crate::server::services::r#impl::patterns::Pattern;
+
+#[derive(Default, Clone, Eq, PartialEq, Hash)]
+pub struct Portainer;
+
+impl ServiceDefinition for Portainer {
+    fn name(&self) -> &'static str {
+        "Portainer"
+    }
+    fn description(&self) -> &'static str {
+        "Container management web interface"
+    }
+    fn category(&self) -> ServiceCategory {
+        ServiceCategory::Virtualization
+    }
+
+    fn discovery_pattern(&self) -> Pattern<'_> {
+        Pattern::AllOf(vec![
+            Pattern::Endpoint(PortBase::new_tcp(9443), "/#!/auth", "portainer"),
+            Pattern::AnyOf(vec![
+                Pattern::Port(PortBase::new_tcp(9000)),
+                Pattern::Port(PortBase::new_tcp(8000)),
+            ]),
+        ])
+    }
+
+    fn logo_url(&self) -> &'static str {
+        "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/portainer.svg"
+    }
+}
+
+inventory::submit!(ServiceDefinitionFactory::new(create_service::<Portainer>));

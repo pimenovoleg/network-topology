@@ -4,8 +4,8 @@ use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;
 
 pub struct DaemonDiscoverySessionManager {
-    current_task: Arc<RwLock<Option<JoinHandle<()>>>>,
-    cancellation_token: Arc<RwLock<CancellationToken>>
+    current_task: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
+    cancellation_token: Arc<RwLock<CancellationToken>>,
 }
 
 impl DaemonDiscoverySessionManager {
@@ -16,6 +16,7 @@ impl DaemonDiscoverySessionManager {
         }
     }
 
+    /// Check if discovery is currently running
     pub async fn is_discovery_running(&self) -> bool {
         tracing::debug!("Checking discovery running on manager instance: {:p}", self);
         let task_guard = self.current_task.read().await;
@@ -34,6 +35,7 @@ impl DaemonDiscoverySessionManager {
         }
     }
 
+    /// Set the current discovery task for cancellation
     pub async fn start_new_session(&self) -> CancellationToken {
         *self.cancellation_token.write().await = CancellationToken::new();
         *self.current_task.write().await = None;
@@ -45,6 +47,7 @@ impl DaemonDiscoverySessionManager {
         *self.current_task.write().await = Some(handle);
     }
 
+    /// Cancel current discovery task
     pub async fn cancel_current_session(&self) -> bool {
         if !self.is_discovery_running().await {
             return false;

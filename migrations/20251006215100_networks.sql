@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS networks (
+    id UUID PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL,
+    is_default BOOLEAN NOT NULL,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
